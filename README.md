@@ -1,16 +1,27 @@
-## Hi there 👋
+DELIMITER $$
 
-<!--
-**nicolasalves13/nicolasalves13** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+CREATE FUNCTION calcular_bonus (id INT)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE anos_servico INT;
+    DECLARE salario_func DECIMAL(10,2);
+    DECLARE bonus DECIMAL(10,2);
 
-Here are some ideas to get you started:
+    -- Calcular anos de serviço e pegar salário do funcionário
+    SELECT TIMESTAMPDIFF(YEAR, data_contratacao, CURDATE()), salario
+    INTO anos_servico, salario_func
+    FROM funcionarios
+    WHERE id_funcionario = id;
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+    -- Regra do bônus
+    IF anos_servico < 1 THEN
+        SET bonus = 0;
+    ELSE
+        SET bonus = salario_func * 0.015 * anos_servico;
+    END IF;
+
+    RETURN bonus;
+END$$
+
+DELIMITER ;
